@@ -1,0 +1,41 @@
+Requires various packages:
+build-essential
+bison
+flex
+libgmp3-dev
+libmpc-dev
+libmpfr-dev
+texinfo
+
+-----------------------------------------------------------------------
+
+export PREFIX="$HOME/cross"
+export TARGET=i486-elf
+export PATH="$PREFIX/bin:$PATH"
+
+mkdir build-binutils
+cd build-binutils/
+../binutils-2.40/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
+
+mkdir build-gdb
+cd build-gdb/
+../gdb-12.1/configure --target=$TARGET --prefix="$PREFIX" --disable-werror
+make all-gdb
+make install-gdb
+
+mkdir build-gcc
+cd build-gcc
+../gcc-12.2.0/configure --target=$TARGET --prefix="$PREFIX" --disable-nls --enable-languages=c,c++ --without-headers
+make all-gcc
+make all-target-libgcc
+make install-gcc
+make install-target-libgcc
+
+-----------------------------------------------------------------------
+
+make build-grub
+cd build-grub
+../grub-2.06/configure --target=$TARGET --host=x86_64-linux-gnu --prefix="$PREFIX" --disable-werror
+make -j23
+make install
+cp grub-install $PREFIX/bin/

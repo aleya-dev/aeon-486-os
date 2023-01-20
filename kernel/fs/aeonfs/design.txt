@@ -1,0 +1,49 @@
+[BOOT] 512 bytes
+    [CODE] 446 Bytes
+    [PARTITION ENTRY] (16 bytes, 4 times)
+        STATUS      1 byte (flags)
+            0x00:   Inactive
+            0x80:   Bootable
+            Anything else is invalid
+        FIRST_CHS (3 bytes; address of the first sector of the partition)
+            HEAD                (1 byte)
+            SECTOR/CYLINDER     (1 byte, bits 5-0 sector, bits 7-6 cylinder msb)
+                7|6|5|4|3|2|1|0
+                c|c|s|s|s|s|s|s
+            CYLINDER            (1 byte, rest of cylinder, lsb)   
+        PARTITION_TYPE (1 byte, type; 0x6Afor AEONFS, see https://en.wikipedia.org/wiki/Partition_type)
+        LAST_CHS (3 bytes; address of the first sector of the partition)
+            HEAD                (1 byte)
+            SECTOR/CYLINDER     (1 byte, bits 5-0 sector, bits 7-6 cylinder msb)
+                7|6|5|4|3|2|1|0
+                c|c|s|s|s|s|s|s
+            CYLINDER            (1 byte, rest of cylinder, lsb)
+        FIRST_LBA (4 bytes; LBA of first absolute sector in partition)
+        NUM_SECTORS (4 bytes; number of sectors in the partition)
+    MAGIC (2 bytes; required by bios, 0x55 0xAA)
+
+[SUPERBLOCK] 512 bytes
+    MAGIC_NUMBER            4 bytes ('AEON')
+    NUM_DIRECTORY_CLUSTERS  4 bytes
+    
+
+[DIRECTORY] (16 per cluster)
+    [ENTRY] (32-bytes)
+        FILENAME         12 bytes (includes a possible .)
+        ATTRIBUTES       2 bytes (flags)
+            0x0001:      USER_READ
+            0x0002:      USER_WRITE
+            0x0004:      USER_EXEC
+            0x0008:      GRP_READ
+            0x0010:      GRP_WRITE
+            0x0020:      GRP_EXEC
+            0x0040:      OTHER_READ
+            0x0080:      OTHER_WRITE
+            0x0100:      OTHER_EXEC
+            0x8000:      DIRECTORY
+        UID              1 byte
+        GID              1 byte
+        CREATE_EPOCH     4 bytes (unsigned epoch)
+        MODIFIED_EPOCH   4 bytes (unsigned epoch)
+        FILE_SIZE        4 bytes
+        FIRST_CLUSTER    4 bytes
