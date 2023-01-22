@@ -24,7 +24,7 @@
                 "intelliSenseMode": "linux-gcc-x86"
             },
             "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-                "copyBuildOutput": true
+                "forceWSL1Toolset":  true
             }
         }
     }]

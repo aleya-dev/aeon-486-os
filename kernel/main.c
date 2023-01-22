@@ -14,7 +14,7 @@ kprint (char *str)
 }
 
 void
-_start (void)
+kernel_main (void)
 {
   kprint ("Hello from the 32-bit kernel.");
 }
