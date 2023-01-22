@@ -1,18 +1,20 @@
-static char* video_memory = (char*) 0xb8000;
+static char *video_memory = (char *)0xb8000;
 
-void kprint(char *str)
+void
+kprint (char *str)
 {
-    char *offset = video_memory;
-    while (*str != '\0')
+  char *offset = video_memory;
+  while (*str != '\0')
     {
-        *offset = *str;
-        ++str;
-        ++offset;
-        ++offset;
+      *offset = *str;
+      ++str;
+      ++offset;
+      ++offset;
     }
 }
 
-void kernel_main()
+void
+_start (void)
 {
-    kprint("Hello from the 32-bit kernel.");
+  kprint ("Hello from the 32-bit kernel.");
 }
