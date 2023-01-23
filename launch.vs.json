@@ -1,0 +1,24 @@
+{
+	"version": "0.2.1",
+	"defaults": {},
+	"configurations": [{
+		"type": "cppdbg",
+		"debuggerConfiguration": "gdbserver",
+		"gdbserverPath": "/usr/bin/gdbserver",
+		"remotePrelaunchCommand": "gdbserver :9999 /usr/bin/qemu-system-i386 -gdb tcp::9999 -cpu 486 -m size=4M,maxmem=4M /mnt/d/Development/aeon_486_os/build_i486_release/floppy.img",
+		"remotePrelaunchWait": "2000",
+		"pipeTransport": {
+			"pipeProgram": "${debugInfo.shellexecPath}",
+			"pipeArgs": [
+				"/s",
+				"${debugInfo.remoteMachineId}",
+				"/p",
+				"${debugInfo.parentProcessId}",
+				"/c",
+				"${debuggerCommand}",
+				"--tty=${debugInfo.tty}"
+			],
+			"debuggerPath": "/usr/bin/gdb"
+		}
+	}]
+}
