@@ -1,0 +1,14 @@
+dd if=/dev/zero of=floppy.img bs=512 count=2880
+
+sudo losetup /dev/loop0 floppy.img
+
+sudo fdisk /dev/loop0 
+
+# Sync fails for some reason.. so update with partx
+sudo partx -u /dev/loop0
+
+sudo mount /dev/loop0p1 test
+
+
+# Delete
+sudo losetup -d /dev/loop0
