@@ -1,8 +1,40 @@
+Note: This is a terrible design for a filesystem. Nobody in their right mind should consider using this.
+It will perform poorly. The only reason it was created is because it is relatively easy to understand and
+implement; this will allow for having at least some filesystem until the OS supports something better.
+
 [BOOT] 512 bytes
 
 [SUPERBLOCK] 512 bytes
+    KERNEL_START_CYLINDER   4 bytes (Start of where the kernel is on the filesystem)
+    KERNEL_START_HEAD       4 bytes (Start of where the kernel is on the filesystem)
+    KERNEL_START_SECTOR     4 bytes (Start of where the kernel is on the filesystem)
+    KERNEL_NUM_SECTORS      4 bytes (Size of the kernel in sectors)
     MAGIC_NUMBER            4 bytes ('AEON')
-    NUM_DIRECTORY_CLUSTERS  4 bytes
+    FIRST_ROOT_DIR_CLUSTER  4 bytes (The first cluster that contains the root directory)
+    NUM_SECTOR_CHAINS       4 bytes
+    NUM_CYLINDERS           4 bytes
+    NUM_HEADS               4 bytes
+    NUM_SECTORS             4 bytes
+    (PADDING)               remaining bytes (could be used by bootsector 2-stage if needed)
+
+This may look like a FAT; and yes, it's similar. But it is not the same. Entries here
+point to sectors (512 bytes, using LBA), not clusters. There are no different cluster
+sizes for this filesystem. The way the amount of required sector chains are calculated
+is also incredibly wasteful for disk space.
+
+Sectors are relative LBA to the start of the _partition_, not the disk itself.
+
+[SECTOR_CHAIN] 512 (NUM_SECTOR_CHAINS times; ~(NUM_SECTORS/144)
+    ENTRY   4 bytes
+        every entry represents a sector on the disk. The value points
+        to where the next sector is for that file.
+        
+        If the MSB is set, then the entry is the last cluster for that file.
+        Entry numbers should always remove the MSB when parsing.
+
+        0xFFFFFFFF that this sector should not be used by anything. This is
+        typically only the superblock and the sector chain itself. Note that the bootsector
+        is not included here, since it is outside of the partion.
 
 [DIRECTORY] (16 per cluster)
     [ENTRY] (32-bytes)
@@ -17,10 +49,12 @@
             0x0040:      OTHER_READ
             0x0080:      OTHER_WRITE
             0x0100:      OTHER_EXEC
-            0x8000:      DIRECTORY
-        UID              1 byte
-        GID              1 byte
-        CREATE_EPOCH     4 bytes (unsigned epoch)
-        MODIFIED_EPOCH   4 bytes (unsigned epoch)
-        FILE_SIZE        4 bytes
-        FIRST_CLUSTER    4 bytes
+            0x2000:      SYMLINK (if set, the sector contains just the full path to the linked file)
+            0x4000:      DIRECTORY
+            0x8000:      DELETED (if set, this entry is free for use for a new file/directory)
+            UID              1 byte
+            GID              1 byte
+            CREATE_EPOCH     4 bytes (unsigned epoch)
+            MODIFIED_EPOCH   4 bytes (unsigned epoch)
+            FILE_SIZE        4 bytes (0 for directories)
+            FIRST_SECTOR     4 bytes (in case of directory, the first sector of the directory sector)

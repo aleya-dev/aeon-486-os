@@ -1,20 +1,13 @@
-static char *video_memory = (char *)0xb8000;
-
-void
-kprint (char *str)
-{
-  char *offset = video_memory;
-  while (*str != '\0')
-    {
-      *offset = *str;
-      ++str;
-      ++offset;
-      ++offset;
-    }
-}
+#include "drivers/display/display.h"
+#include "drivers/display/textmode.h"
 
 void
 kernel_main (void)
 {
-  kprint ("Hello from the 32-bit kernel.");
+  display_t *display = textmode_init ();
+  display->clear ();
+  display_register (display);
+
+  kprintf ("Hello! %i\n", 1337);
+  kprintf ("This is a kernel!");
 }
