@@ -11,5 +11,5 @@ kernel_main (void)
 
   kprintf ("Now booting AEON\n");
 
-  idt_init ();
+  //idt_init ();
 }

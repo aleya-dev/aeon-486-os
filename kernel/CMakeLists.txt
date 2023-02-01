@@ -1,5 +1,5 @@
 add_executable(kernel.bin
-    entry.asm
+    boot.s
     main.c
     drivers/display/display.c
     drivers/display/display.h
@@ -23,9 +23,12 @@ add_executable(kernel.bin
 
 set_target_properties(kernel.bin PROPERTIES
     LINKER_LANGUAGE C
-    ASM_NASMFLAGS "-f elf"
-    CFLAGS "-ffreestanding"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+)
+
+target_link_options(kernel.bin
+    PRIVATE
+        -T ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld
 )
 
 target_include_directories(kernel.bin
