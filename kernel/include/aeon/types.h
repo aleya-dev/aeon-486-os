@@ -1,5 +1,5 @@
-#ifndef AEON_TYPES_FILE_H
-#define AEON_TYPES_FILE_H
+#ifndef AEON_KERNEL_TYPES_H
+#define AEON_KERNEL_TYPES_H
 
 /* Prepended with k to not clash with standard C types */
 typedef char kint8_t;

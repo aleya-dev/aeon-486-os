@@ -1,4 +1,5 @@
 #include "display.h"
+#include <aeon/mutex.h>
 #include <aeon/stdlib.h>
 #include <aeon/string.h>
 
@@ -6,6 +7,8 @@
 
 static kuint32_t s_num_displays = 0;
 static display_t *s_displays[MAX_DISPLAYS];
+
+DEFINE_MUTEX (m_kprintf);
 
 static void
 display_puts (const char *str)
@@ -44,6 +47,8 @@ void
 kvprintf (const char *fmt, va_list ap)
 {
   char *s = 0;
+
+  mutex_lock (&m_kprintf);
 
   for (ksize_t i = 0u; i < strlen (fmt); ++i)
     {
@@ -98,5 +103,5 @@ kvprintf (const char *fmt, va_list ap)
         }
     }
 
-  va_end (ap);
+  mutex_unlock (&m_kprintf);
 }

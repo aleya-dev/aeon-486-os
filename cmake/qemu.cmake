@@ -9,11 +9,11 @@ if (QEMU_EXECUTABLE)
     set(QEMU_FOUND ON CACHE BOOL "")
 
     add_custom_target(qemu
-        ${QEMU_EXECUTABLE} -gdb tcp::9999 -cpu 486 -m size=4M,maxmem=4M ${CMAKE_BINARY_DIR}/floppy.img
+        ${QEMU_EXECUTABLE} -gdb tcp::9999 -cpu 486 -m size=4M,maxmem=4M ${CMAKE_BINARY_DIR}/hdd.img
     )
 
     add_dependencies(qemu
-        floppy
+        image
     )
 else ()
     message(WARNING "qemu not found.")

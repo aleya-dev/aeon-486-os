@@ -1,5 +1,6 @@
 #include "drivers/display/display.h"
 #include "drivers/display/textmode.h"
+#include "platform/i386/idt.h"
 
 void
 kernel_main (void)
@@ -8,6 +9,7 @@ kernel_main (void)
   display->clear ();
   display_register (display);
 
-  kprintf ("Hello! %i\n", 1337);
-  kprintf ("This is a kernel!");
+  kprintf ("Now booting AEON\n");
+
+  idt_init ();
 }

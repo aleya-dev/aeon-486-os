@@ -1,5 +1,5 @@
-#ifndef AEON_CONSOLE_H
-#define AEON_CONSOLE_H
+#ifndef AEON_KERNEL_CONSOLE_H
+#define AEON_KERNEL_CONSOLE_H
 
 #include <aeon/types.h>
 

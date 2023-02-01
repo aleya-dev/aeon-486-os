@@ -7,14 +7,18 @@ add_executable(kernel.bin
     drivers/display/textmode.h
     platform/i386/hal.c
     platform/i386/hal.h
+    platform/i386/idt.c
+    platform/i386/idt.h
     lib/stdlib.c
     lib/string.c
+    lib/mutex.c
     include/aeon/file.h
     include/aeon/memory.h
     include/aeon/types.h
     include/aeon/stdlib.h
     include/aeon/string.h
     include/aeon/console.h
+    include/aeon/mutex.h
 )
 
 set_target_properties(kernel.bin PROPERTIES

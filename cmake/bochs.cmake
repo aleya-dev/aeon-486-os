@@ -16,7 +16,7 @@ if (BOCHS_EXECUTABLE)
     )
 
     add_dependencies(bochs
-        floppy
+        image
     )
 else ()
     message(WARNING "Bochs not found.")

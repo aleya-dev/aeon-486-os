@@ -15,9 +15,20 @@ typedef struct display_t
   void (*clear) (void);
 } display_t;
 
-void display_register(display_t *display);
+void display_register (display_t *display);
 
 void kprintf (const char *fmt, ...);
-void kvprintf(const char *fmt, va_list ap);
+void kvprintf (const char *fmt, va_list ap);
+
+#define panic(...)                                                            \
+  do                                                                          \
+    {                                                                         \
+      kprintf ("***KERNEL PANIC*** in %s at line %d in function: %s\n",       \
+               __FILE__, __LINE__, __func__);                                 \
+      kprintf (__VA_ARGS__);                                                  \
+      for (;;)                                                                \
+        ;                                                                     \
+    }                                                                         \
+  while (0)
 
 #endif /* DISPLAY_H */
