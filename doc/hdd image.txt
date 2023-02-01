@@ -1,0 +1,30 @@
+dd if=/dev/zero of=hdd.img count=40 bs=1048576
+
+sudo fdisk hdd.img
+o            # Create new dos partition table
+n            # Create new partition
+p            # Primary
+<enter>      # Partition 1
+<enter>      # First sector 2048
+<enter>      # Last sector NNNNNN
+t            # Set type
+0b           # Fat32
+w            # Write
+
+sudo losetup -P /dev/loop0 hdd.img
+sudo mkfs.fat -F 32 /dev/loop0p1
+
+sudo mkdir /mnt/hdd
+sudo mount /dev/loop0p1 /mnt/hdd
+
+#sudo env PATH="$PATH" grub-install /dev/loop0
+sudo grub-install --root-directory /mnt/hdd --boot-directory=/mnt/hdd/boot /dev/loop0
+
+sudo mkdir -p /mnt/hdd/boot/grub
+sudo cp grub.cfg /mnt/hdd/boot/grub/
+sudo cp build_i486_release/kernel.bin /mnt/hdd/boot/
+
+sudo sync
+sudo umount /mnt/hdd
+
+sudo losetup -d /dev/loop0
