@@ -1,0 +1,27 @@
+From: https://q4.github.io/bootgrub.html
+
+GRUB boot floppy
+Here is a floppy image of a universal bootfloppy for x86-based machines, containing the grub boot loader and nothing else.
+Except, I should perhaps mention, a nice menu for pleasure and quicker operation, memtest.bin so you can check whether your RAM is intact, the grub files for accessing file systems and a few additional primary bootloaders (512-byte blocks) e.g. for MacOSX, which can be chainloaded when necessary. If an important bootloader is missing which you think should be included, please send it to me. Error reports are also welcome.
+This floppy is a brilliant tool to have around when you can't load your operating system, or when your boot loader is broken.
+
+Download
+Simply download bootgrub.gz (115 kb).
+
+How to get the image onto a floppy
+Unzip the image, and copy it to a floppy disk, sector by sector. On Linux, you can simply type (with appropriate privileges):
+cp bootgrub /dev/fd0
+
+Alternatively, if you need to impress someone:
+gzip -d < bootgrub.gz | dd of=/dev/fd0u1440
+
+On almost all Unix systems (including MacOSX), you can use:
+dd if=bootgrub of=floppy_device bs=1k
+
+On DOS or Windows systems rawrite.exe, dd.exe or similar tools exist.
+
+PS:
+Thank you, GRUB developers out there!
+
+
+My contact details can be found on my home page.
