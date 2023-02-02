@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "gdb",
+            "request": "attach",
+            "executable": "${workspaceRoot}/build_i486_debug/kernel.bin",
+            "target": "127.0.0.1:1234",
+            "remote": true,
+            "cwd": "${workspaceRoot}/build_i486_debug",
+            "gdbpath": "gdb",
+            "autorun": []
+        }
+    ]
+}
