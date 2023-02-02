@@ -1,4 +1,4 @@
-dd if=/dev/zero of=hdd.img count=40 bs=1048576
+dd if=/dev/zero of=hdd.img count=100 bs=1048576
 
 sudo fdisk hdd.img
 o            # Create new dos partition table
