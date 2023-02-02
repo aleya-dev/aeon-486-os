@@ -1,9 +1,10 @@
 #include "textmode.h"
 #include <aeon/memory.h>
 
-#define VGA_MEMORY 0xB8000
+//#define VGA_MEMORY 0xB8000
+#define VGA_MEMORY 0xC03FF000
 #define TEXTMODE_WIDTH 80
-#define TEXTMODE_HEIGHT 26
+#define TEXTMODE_HEIGHT 20
 
 static display_t display = { 0 };
 

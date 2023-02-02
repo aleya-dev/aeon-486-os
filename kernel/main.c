@@ -1,6 +1,6 @@
 #include "drivers/display/display.h"
 #include "drivers/display/textmode.h"
-#include "platform/i386/idt.h"
+//#include "platform/i386/idt.h"
 
 void
 kernel_main (void)
