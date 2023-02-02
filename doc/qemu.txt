@@ -1,0 +1,10 @@
+qemu-system-i386 --kernel build_i486_debug/kernel.bin -no-reboot -d cpu_reset
+
+# With debugger on tcp::1234 and wait for debugger attach
+qemu-system-i386 --kernel build_i486_debug/kernel.bin -no-reboot -d cpu_reset -s -S
+
+gdb build_i486_debug/kernel.bin
+target remote :1234
+b kernel_main
+c # Continue
+s # Step

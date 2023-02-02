@@ -17,7 +17,6 @@ sudo mkfs.fat -F 32 /dev/loop0p1
 sudo mkdir /mnt/hdd
 sudo mount /dev/loop0p1 /mnt/hdd
 
-#sudo env PATH="$PATH" grub-install /dev/loop0
 sudo grub-install --root-directory /mnt/hdd --boot-directory=/mnt/hdd/boot /dev/loop0
 
 sudo mkdir -p /mnt/hdd/boot/grub
