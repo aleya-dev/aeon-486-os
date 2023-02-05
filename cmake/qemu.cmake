@@ -9,11 +9,11 @@ if (QEMU_EXECUTABLE)
     set(QEMU_FOUND ON CACHE BOOL "")
 
     add_custom_target(qemu
-        ${QEMU_EXECUTABLE} -gdb tcp::9999 -cpu 486 -m size=4M,maxmem=4M ${CMAKE_BINARY_DIR}/hdd.img
+        ${QEMU_EXECUTABLE} -s -cpu 486 -m size=4M,maxmem=4M --kernel ${CMAKE_BINARY_DIR}/kernel.bin -no-reboot -d cpu_reset
     )
 
     add_dependencies(qemu
-        image
+        kernel.bin
     )
 else ()
     message(WARNING "qemu not found.")

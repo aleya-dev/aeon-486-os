@@ -9,9 +9,12 @@ add_executable(kernel.bin
     platform/i386/hal.h
     platform/i386/idt.c
     platform/i386/idt.h
+    platform/i386/gdt.c
+    platform/i386/gdt.h
     lib/stdlib.c
     lib/string.c
     lib/mutex.c
+    lib/memory.c
     include/aeon/file.h
     include/aeon/memory.h
     include/aeon/types.h

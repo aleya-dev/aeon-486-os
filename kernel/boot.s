@@ -5,6 +5,8 @@
 .set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
 .set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
 
+.set KERNEL_START_OFFSET, 0xC0000000
+
 # Declare a multiboot header that marks the program as a kernel.
 .section .multiboot.data, "aw"
 .align 4
@@ -38,7 +40,7 @@ _start:
 	# TODO: I recall seeing some assembly that used a macro to do the
 	#       conversions to and from physical. Maybe this should be done in this
 	#       code as well?
-	movl $(boot_page_table1 - 0xC0000000), %edi
+	movl $(boot_page_table1 - KERNEL_START_OFFSET), %edi
 	# First address to map is address 0.
 	# TODO: Start at the first kernel page instead. Alternatively map the first
 	#       1 MiB as it can be generally useful, and there's no need to
@@ -51,7 +53,7 @@ _start:
 	# Only map the kernel.
 	cmpl $_kernel_start, %esi
 	jl 2f
-	cmpl $(_kernel_end - 0xC0000000), %esi
+	cmpl $(_kernel_end - KERNEL_START_OFFSET), %esi
 	jge 3f
 
 	# Map physical address as "present, writable". Note that this maps
@@ -70,7 +72,7 @@ _start:
 
 3:
 	# Map VGA video memory to 0xC03FF000 as "present, writable".
-	movl $(0x000B8000 | 0x003), boot_page_table1 - 0xC0000000 + 1023 * 4
+	movl $(0x000B8000 | 0x003), boot_page_table1 - KERNEL_START_OFFSET + 1023 * 4
 
 	# The page table is used at both page directory entry 0 (virtually from 0x0
 	# to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
@@ -80,11 +82,11 @@ _start:
 	# would instead page fault if there was no identity mapping.
 
 	# Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
-	movl $(boot_page_table1 - 0xC0000000 + 0x003), boot_page_directory - 0xC0000000 + 0
-	movl $(boot_page_table1 - 0xC0000000 + 0x003), boot_page_directory - 0xC0000000 + 768 * 4
+	movl $(boot_page_table1 - KERNEL_START_OFFSET + 0x003), boot_page_directory - KERNEL_START_OFFSET + 0
+	movl $(boot_page_table1 - KERNEL_START_OFFSET + 0x003), boot_page_directory - KERNEL_START_OFFSET + 768 * 4
 
 	# Set cr3 to the address of the boot_page_directory.
-	movl $(boot_page_directory - 0xC0000000), %ecx
+	movl $(boot_page_directory - KERNEL_START_OFFSET), %ecx
 	movl %ecx, %cr3
 
 	# Enable paging and the write-protect bit.

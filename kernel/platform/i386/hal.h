@@ -3,10 +3,10 @@
 
 #include <aeon/types.h>
 
-#define INT_START asm volatile ("pusha");
+#define INT_START __asm__ volatile ("pusha")
 #define INT_END                                                               \
-  asm volatile ("popa");                                                      \
-  asm volatile ("iret");
+  __asm__ volatile ("popa");                                                  \
+  __asm__ volatile ("iret")
 
 kuint8_t inportb (const kuint16_t port);
 

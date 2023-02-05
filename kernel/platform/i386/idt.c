@@ -1,47 +1,49 @@
 #include "drivers/display/display.h"
 #include "platform/i386/hal.h"
+#include <aeon/memory.h>
 #include <aeon/types.h>
 
-void _set_idtr (void)
+typedef struct idt_entry_t
 {
-	//asm volatile ("push %ebp");
-	//asm volatile ("movl %esp, %ebp");
+  kuint16_t entry_point_address_lo;
+  kuint16_t segment_selector; /* Our kernel segment goes here! */
+  kuint8_t always0;           /* This will ALWAYS be set to 0! */
+  kuint8_t flags;             /* Set using the above table! */
+  kuint16_t entry_point_address_hi;
+} __attribute__ ((packed)) idt_entry_t;
 
-	asm volatile ("lidt 0x10F0");
-    
-	//asm volatile ("movl %ebp, %esp");
-	//asm volatile ("pop %ebp");
-	//asm volatile ("ret");
+typedef struct idt_ptr_t
+{
+  kuint16_t limit;
+  kuint32_t base;
+} __attribute__ ((packed)) idt_ptr_t;
+
+static idt_entry_t g_idt[256];
+static idt_ptr_t g_idtp;
+
+static void
+idt_update_lidt (void)
+{
+  __asm__ volatile ("lidt %0" ::"m"(g_idtp));
 }
 
-void _idt_default_handler (void)
+void
+idt_set_gate (const kuint8_t index, const void *base,
+              const kuint16_t segment_selector, const kuint8_t flags)
 {
-	asm volatile ("pushal");
-	asm volatile ("mov $0x20, %al");
-	asm volatile ("mov $0x20, %dx");
-	asm volatile ("out %al, %dx");
-	asm volatile ("popal");
-	asm volatile ("iretl");
+  g_idt[index].entry_point_address_lo = (((const kuint32_t)base) & 0xFFFF);
+  g_idt[index].entry_point_address_hi
+      = (((const kuint32_t)base) >> 16) & 0xFFFF;
+  g_idt[index].segment_selector = segment_selector;
+  g_idt[index].always0 = 0;
+  g_idt[index].flags = flags;
 }
-
-static kuint32_t idt_location = 0;
-static kuint32_t idtr_location = 0;
-static kuint16_t idt_size = 0x800;
 
 static kuint8_t test_success = 0;
 static kuint32_t test_timeout = 0x1000;
 
-static kuint8_t __idt_setup = 0;
-
 void
-schedule (void)
-{
-  /* TODO: Implement scheduler */
-  asm volatile ("iret");
-}
-
-void
-__idt_test_handler (void)
+__idt_test_handler ()
 {
   INT_START;
   test_success = 1;
@@ -49,63 +51,33 @@ __idt_test_handler (void)
 }
 
 void
-idt_register_interrupt (kuint8_t i, kuint32_t callback)
-{
-  if (!__idt_setup)
-    panic ("Invalid IDT!");
-
-  *(kuint16_t *)(idt_location + 8 * i + 0)
-      = (kuint16_t)(callback & 0x0000ffff);
-  *(kuint16_t *)(idt_location + 8 * i + 2) = (kuint16_t)0x8;
-  *(kuint8_t *)(idt_location + 8 * i + 4) = 0x00;
-  *(kuint8_t *)(idt_location + 8 * i + 5)
-      = 0x8e; // 0 | IDT_32BIT_INTERRUPT_GATE | IDT_PRESENT;
-  *(kuint16_t *)(idt_location + 8 * i + 6)
-      = (kuint16_t)((callback & 0xffff0000) >> 16);
-
-  if (test_success)
-    kprintf ("Registered INT#%d\n", i);
-}
-
-void
 idt_init (void)
 {
-  idt_location = 0x2000;
-  kprintf ("Location: 0x%x\n", idt_location);
+  /* Sets the special IDT pointer up, just like in 'gdt.c' */
+  g_idtp.limit = sizeof (g_idt) - 1;
+  g_idtp.base = (kuint32_t)&g_idt;
 
-  idtr_location = 0x10F0;
-  kprintf ("IDTR location: 0x%x\n", idtr_location);
-  __idt_setup = 1;
+  /* Clear out the entire IDT, initializing it to zeros */
+  memset (&g_idt, 0, sizeof (idt_entry_t) * 256);
 
-  for (kuint8_t i = 0; i < 255; i++)
-    {
-      idt_register_interrupt (i, (kuint32_t)&_idt_default_handler);
-    }
-  idt_register_interrupt (0x2f, (kuint32_t)&__idt_test_handler);
+  /* Add any new ISRs to the IDT here using idt_set_gate */
+  idt_set_gate (0x2f, &__idt_test_handler, 0x08, 0x8e); // 0 |
+  // IDT_32BIT_INTERRUPT_GATE | IDT_PRESENT;);
 
-    //idt_register_interrupt (0x2e, (kuint32_t)&schedule);
+  /* Points the processor's internal register to the new IDT */
+  idt_update_lidt ();
 
-  kprintf ("Registered all interrupts to default handler.\n");
+  kprintf ("Testing IDT...");
 
-  /* create IDTR now */
-  *(kuint16_t *)idtr_location = idt_size - 1;
-  *(kuint32_t *)(idtr_location + 2) = idt_location;
-  kprintf ("IDTR.size = 0x%x IDTR.offset = 0x%x\n",
-           *(kuint16_t *)idtr_location, *(kuint32_t *)(idtr_location + 2));
-  _set_idtr ();
-  kprintf ("IDTR set, testing link.\n");
-
-  asm volatile ("int $0x2f");
+  //__asm__ volatile ("int $0x2f");
   while (test_timeout-- != 0)
     {
       if (test_success != 0)
         {
-          kprintf ("Test succeeded, disabling INT#0x2F\n");
-          idt_register_interrupt (0x2F, (kuint32_t)&_idt_default_handler);
+          kprintf ("SUCCESS\n");
           break;
         }
     }
-
   if (!test_success)
-    panic ("IDT link is offline (timeout).");
+    panic ("FAILED (timeout)");
 }

@@ -23,8 +23,8 @@ void kvprintf (const char *fmt, va_list ap);
 #define panic(...)                                                            \
   do                                                                          \
     {                                                                         \
-      kprintf ("***KERNEL PANIC*** in %s at line %d in function: %s\n",       \
-               __FILE__, __LINE__, __func__);                                 \
+      kprintf ("\n\n***KERNEL PANIC***\n\n %s:%d in %s.\n", __FILE__,         \
+               __LINE__, __func__);                                           \
       kprintf (__VA_ARGS__);                                                  \
       for (;;)                                                                \
         ;                                                                     \
