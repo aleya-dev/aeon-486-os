@@ -1,9 +1,3 @@
-#.globl idt_test_func
-#.type idt_test_func, @function
-#
-#idt_test_func:
-#    nop
-
 .macro ISR_ERRCODE idx
   .globl isr_\idx
   isr_\idx:
@@ -22,7 +16,6 @@
     push $\idx                 # Push the interrupt number
     jmp isr_common_stub
 .endm
-
 
 ISR_NOERRCODE 0
 ISR_NOERRCODE 1
@@ -58,12 +51,12 @@ ISR_NOERRCODE 30
 ISR_NOERRCODE 31
 
 isr_common_stub:
-    pusha                    # Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
+    pusha           # Pushes edi,esi,ebp,esp,ebx,edx,ecx,eax
 
-    mov %ds, %ax             # Lower 16-bits of eax = ds.
-    push %eax                # save the data segment descriptor
+    mov %ds, %ax    # Lower 16-bits of eax = ds.
+    push %eax       # save the data segment descriptor
 
-    mov $0x10, %ax   # load the kernel data segment descriptor
+    mov $0x10, %ax  # load the kernel data segment descriptor
     mov %ax, %ds
     mov %ax, %es
     mov %ax, %fs
@@ -77,7 +70,7 @@ isr_common_stub:
     mov %bx, %fs
     mov %bx, %gs
 
-    popa                     # Pops edi,esi,ebp...
-    add $8, %esp     # Cleans up the pushed error code and pushed ISR number
+    popa            # Pops edi,esi,ebp...
+    add $8, %esp    # Cleans up the pushed error code and pushed ISR number
     sti
-    iret           # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
+    iret            # pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
