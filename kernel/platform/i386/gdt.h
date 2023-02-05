@@ -99,4 +99,10 @@ typedef struct gdt_ptr_t
 
 void gdt_init (void);
 
+#define KERNEL_CODE_SEGMENT_INDEX 0x08
+#define KERNEL_DATA_SEGMENT_INDEX 0x10
+
+#define USER_CODE_SEGMENT_INDEX 0x18
+#define USER_DATA_SEGMENT_INDEX 0x20
+
 #endif /* GDT_H */

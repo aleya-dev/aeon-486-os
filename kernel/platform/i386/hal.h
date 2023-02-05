@@ -20,4 +20,6 @@ void outportw (const kuint16_t port, const kuint16_t value);
 
 void outportl (const kuint16_t port, const kuint32_t value);
 
+void io_wait(void);
+
 #endif /* HAL_H */

@@ -41,3 +41,9 @@ outportl (const kuint16_t port, const kuint32_t value)
 {
   __asm__ volatile ("outl %%eax, %%dx" : : "d"(port), "a"(value));
 }
+
+void
+io_wait (void)
+{
+  outportb (0x80, 0);
+}
