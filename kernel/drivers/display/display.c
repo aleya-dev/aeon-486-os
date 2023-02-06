@@ -46,6 +46,7 @@ kprintf (const char *fmt, ...)
 void
 kvprintf (const char *fmt, va_list ap)
 {
+  int num_width = 0;
   char *s = 0;
 
   mutex_lock (&m_kprintf);
@@ -56,7 +57,17 @@ kvprintf (const char *fmt, va_list ap)
         {
           switch (fmt[i + 1])
             {
+            case '0':
+              {
+                num_width = fmt[i + 2] - '0';
+                ++i;
+                ++i;
+                break;
+              }
+            }
 
+          switch (fmt[i + 1])
+            {
             case 's':
               {
                 s = va_arg (ap, char *);
@@ -67,18 +78,40 @@ kvprintf (const char *fmt, va_list ap)
             case 'i':
             case 'd':
               {
+                int len;
                 const int c = va_arg (ap, int);
                 char str[32] = { 0 };
                 itoa_s (c, str, 10);
+
+                len = strlen (str);
+
+                if (len < num_width)
+                  {
+                    int i;
+                    for (i = 0; i < num_width - len; ++i)
+                      display_putc ('0');
+                  }
+
                 display_puts (str);
                 ++i;
                 continue;
               }
             case 'x':
               {
+                int len;
                 const int c = va_arg (ap, int);
                 char str[32] = { 0 };
                 itoa (c, str, 16);
+
+                len = strlen (str);
+
+                if (len < num_width)
+                  {
+                    int i;
+                    for (i = 0; i < num_width - len; ++i)
+                      display_putc ('0');
+                  }
+
                 display_puts (str);
                 ++i;
                 continue;

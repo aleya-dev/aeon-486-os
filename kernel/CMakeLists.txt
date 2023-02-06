@@ -1,6 +1,8 @@
 add_executable(kernel.bin
     boot.s
     main.c
+    drivers/block/ata.c
+    drivers/block/ata.h
     drivers/display/display.c
     drivers/display/display.h
     drivers/display/textmode.c
@@ -18,8 +20,12 @@ add_executable(kernel.bin
     lib/string.c
     lib/mutex.c
     lib/memory.c
+    lib/hexdump.c
+    lib/hexdump.h
+    lib/ctype.c
     include/aeon/file.h
     include/aeon/memory.h
+    include/aeon/ctype.h
     include/aeon/types.h
     include/aeon/stdlib.h
     include/aeon/string.h

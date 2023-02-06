@@ -1,3 +1,4 @@
+#include "drivers/block/ata.h"
 #include "drivers/display/display.h"
 #include "drivers/display/textmode.h"
 #include "platform/i386/gdt.h"
@@ -17,6 +18,8 @@ kernel_main (void)
 
   idt_init ();
   irq_init ();
+
+  ata_init ();
 
   kprintf ("Done!\n");
 }
