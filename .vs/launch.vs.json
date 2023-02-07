@@ -1,0 +1,25 @@
+{
+    "version": "0.2.1",
+    "defaults": {},
+    "configurations": [
+        {
+            "type": "cppdbg",
+            "name": "Debug Kernel",
+            "project": "CMakeLists.txt",
+            "projectTarget": "kernel.bin",
+            "cwd": "${workspaceRoot}",
+            "program": "${workspaceRoot}\\build_i486_debug\\kernel.bin",
+            "MIMode": "gdb",
+            "externalConsole": true,
+            "inheritEnvironments": [
+                "gcc"
+            ],
+            "miDebuggerPath": "C:\\msys64\\usr\\bin\\gdb.exe",
+            "showDisplayString": true,
+            "miDebuggerServerAddress": "localhost:1234",
+            "launchCompleteCommand": "None",
+            "filterStderr": true,
+            "filterStdout": true
+        }
+    ]
+}
