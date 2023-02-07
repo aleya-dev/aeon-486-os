@@ -1,7 +1,7 @@
 #include "ata.h"
 #include <aeon/types.h>
-#include <lib/hexdump.h>
 #include <drivers/display/display.h>
+#include <lib/hexdump.h>
 #include <platform/i386/hal.h>
 
 #define ATA_PRIMARY_IO 0x1F0
@@ -134,7 +134,7 @@ ide_identify (kuint8_t bus, kuint8_t drive)
   outportb (io + ATA_REG_LBA2, 0);
   /* Now, send IDENTIFY */
   outportb (io + ATA_REG_COMMAND, ATA_CMD_IDENTIFY);
-  //kprintf ("Sent IDENTIFY\n");
+  // kprintf ("Sent IDENTIFY\n");
   /* Now, read status port */
   kuint8_t status = inportb (io + ATA_REG_STATUS);
   if (status)
@@ -172,31 +172,31 @@ ata_probe (void)
    */
 
   ide_identify (ATA_PRIMARY, ATA_MASTER);
-    {
-      ata_pm = 1;
-      // device_t *dev = (device_t *)malloc(sizeof(device_t));
-      // ide_private_data *priv = (ide_private_data
-      // *)malloc(sizeof(ide_private_data));
-      /* Now, process the IDENTIFY data */
-      /* Model goes from W#27 to W#46 */
-      // char *str = (char *)malloc(40);
-      char str[40];
-      for (int i = 0; i < 40; i += 2)
-        {
-          str[i] = ide_buf[ATA_IDENT_MODEL + i + 1];
-          str[i + 1] = ide_buf[ATA_IDENT_MODEL + i];
-        }
-      // dev->name = str;
-      // dev->unique_id = 32;
-      // dev->dev_type = DEVICE_BLOCK;
-      // priv->drive = (ATA_PRIMARY << 1) | ATA_MASTER;
-      // dev->priv = priv;
-      // dev->read = ata_read;
-      // device_add(dev);
-      kprintf ("Device: %s\n", str);
+  {
+    ata_pm = 1;
+    // device_t *dev = (device_t *)malloc(sizeof(device_t));
+    // ide_private_data *priv = (ide_private_data
+    // *)malloc(sizeof(ide_private_data));
+    /* Now, process the IDENTIFY data */
+    /* Model goes from W#27 to W#46 */
+    // char *str = (char *)malloc(40);
+    char str[40];
+    for (int i = 0; i < 40; i += 2)
+      {
+        str[i] = ide_buf[ATA_IDENT_MODEL + i + 1];
+        str[i + 1] = ide_buf[ATA_IDENT_MODEL + i];
+      }
+    // dev->name = str;
+    // dev->unique_id = 32;
+    // dev->dev_type = DEVICE_BLOCK;
+    // priv->drive = (ATA_PRIMARY << 1) | ATA_MASTER;
+    // dev->priv = priv;
+    // dev->read = ata_read;
+    // device_add(dev);
+    kprintf ("Device: %s\n", str);
 
-      khexdump(ide_buf, sizeof(ide_buf));
-    }
+    khexdump (ide_buf, sizeof (ide_buf));
+  }
   ide_identify (ATA_PRIMARY, ATA_SLAVE);
   /*ide_identify(ATA_SECONDARY, ATA_MASTER);
   ide_identify(ATA_SECONDARY, ATA_SLAVE);*/
