@@ -1,7 +1,7 @@
 #ifndef AEON_KERNEL_MUTEX_H
 #define AEON_KERNEL_MUTEX_H
 
-#include <aeon/types.h>
+#include <klibc/types.h>
 
 typedef struct mutex_t
 {

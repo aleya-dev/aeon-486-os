@@ -1,7 +1,7 @@
 #ifndef HAL_H
 #define HAL_H
 
-#include <aeon/types.h>
+#include <klibc/types.h>
 
 #define INT_START __asm__ volatile ("pusha")
 #define INT_END                                                               \

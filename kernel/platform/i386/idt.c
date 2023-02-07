@@ -1,8 +1,8 @@
 #include "drivers/display/display.h"
 #include "platform/i386/hal.h"
-#include <aeon/memory.h>
-#include <aeon/types.h>
-#include <platform/i386/gdt.h>
+#include "platform/i386/gdt.h"
+#include <klibc/memory.h>
+#include <klibc/types.h>
 
 extern void isr_0 (void);
 extern void isr_1 (void);

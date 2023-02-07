@@ -1,4 +1,4 @@
-#include <aeon/string.h>
+#include <klibc/string.h>
 
 ksize_t
 strlen (const char *str)

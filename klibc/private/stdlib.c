@@ -1,5 +1,5 @@
-#include <aeon/stdlib.h>
-#include <stddef.h>
+#include <klibc/stdlib.h>
+#include <klibc/stddef.h>
 
 static char tbuf[32];
 static const char bchars[] = { '0', '1', '2', '3', '4', '5', '6', '7',

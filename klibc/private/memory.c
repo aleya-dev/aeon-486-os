@@ -1,4 +1,4 @@
-#include <aeon/memory.h>
+#include <klibc/memory.h>
 
 void *
 memcpy (const void *dest, const void *src, ksize_t count)

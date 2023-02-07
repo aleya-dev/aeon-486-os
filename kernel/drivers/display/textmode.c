@@ -1,5 +1,5 @@
 #include "textmode.h"
-#include <aeon/memory.h>
+#include <klibc/memory.h>
 
 //#define VGA_MEMORY 0xB8000
 #define VGA_MEMORY 0xC03FF000

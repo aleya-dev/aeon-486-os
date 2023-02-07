@@ -1,5 +1,5 @@
-#ifndef AEON_KERNEL_TYPES_H
-#define AEON_KERNEL_TYPES_H
+#ifndef KLIBC_TYPES_H
+#define KLIBC_TYPES_H
 
 /* Prepended with k to not clash with standard C types */
 typedef char kint8_t;
@@ -21,15 +21,4 @@ typedef kint32_t offset_t;
 /* Generic size type */
 typedef kuint32_t ksize_t;
 
-/* Dummy macros used for api documentation */
-
-/* A given pointer to a function is written to by the function */
-#define OUT
-
-/* A given pointer to a function is only read by the function */
-#define IN
-
-/* A given pointer to a function is read from and then written into */
-#define INOUT
-
-#endif
+#endif /* KLIBC_TYPES_H */

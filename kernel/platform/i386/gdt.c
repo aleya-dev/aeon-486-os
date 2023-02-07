@@ -1,5 +1,5 @@
 #include "gdt.h"
-#include <aeon/stdlib.h>
+#include <klibc/stdlib.h>
 
 static gdt_ptr_t g_gdt_ptr;
 static gdt_entry_t g_gdt_entries[5];

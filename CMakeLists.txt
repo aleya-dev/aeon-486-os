@@ -5,6 +5,7 @@ project(aeon_486_os C ASM)
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_SOURCE_DIR}/cmake")
 include(qemu)
 
+add_subdirectory(klibc)
 add_subdirectory(kernel)
 
 add_custom_target(image #ALL

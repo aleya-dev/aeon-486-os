@@ -1,7 +1,7 @@
 #ifndef GDT_H
 #define GDT_H
 
-#include <aeon/types.h>
+#include <klibc/types.h>
 
 /* Access flags */
 

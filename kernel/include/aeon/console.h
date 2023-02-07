@@ -1,7 +1,7 @@
 #ifndef AEON_KERNEL_CONSOLE_H
 #define AEON_KERNEL_CONSOLE_H
 
-#include <aeon/types.h>
+#include <klibc/types.h>
 
 typedef struct console_t
 {

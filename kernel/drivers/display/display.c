@@ -1,7 +1,7 @@
 #include "display.h"
 #include <aeon/mutex.h>
-#include <aeon/stdlib.h>
-#include <aeon/string.h>
+#include <klibc/stdlib.h>
+#include <klibc/string.h>
 
 #define MAX_DISPLAYS 8
 

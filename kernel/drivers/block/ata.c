@@ -1,8 +1,8 @@
 #include "ata.h"
-#include <aeon/types.h>
 #include <drivers/display/display.h>
-#include <lib/hexdump.h>
 #include <platform/i386/hal.h>
+#include <lib/hexdump.h>
+#include <klibc/types.h>
 
 #define ATA_PRIMARY_IO 0x1F0
 #define ATA_SECONDARY_IO 0x170

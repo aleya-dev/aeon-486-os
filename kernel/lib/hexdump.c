@@ -1,6 +1,6 @@
 #include "hexdump.h"
 #include <drivers/display/display.h>
-#include <aeon/ctype.h>
+#include <klibc/ctype.h>
 
 void khexdump(const void *src, const ksize_t len)
 {
