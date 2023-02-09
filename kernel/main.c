@@ -33,14 +33,10 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
 
   kprintf ("Now booting AEON\n");
 
-  khexdump (g_page_directory, 64);
-  khexdump (g_page_table_00000000, 64);
-  khexdump (g_page_table_C0000000, 64);
-
   idt_init ();
   irq_init ();
 
-  // ata_init ();
+  ata_init ();
 
   kprintf ("Done!\n");
 }
