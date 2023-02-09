@@ -9,14 +9,14 @@ SECTIONS
 
     _kernel_start = .;
 
-    .multiboot.data :
+    .data.multiboot :
     {
-        *(.multiboot.data)
+        *(.data.multiboot)
     }
 
-    .multiboot.text :
+    .text.multiboot :
     {
-        *(.multiboot.text)
+        *(.text.multiboot)
     }
 
     . += kernel_paged_offset_address;

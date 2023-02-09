@@ -15,7 +15,7 @@
 ###############################################################################
 # Multiboot header
 ###############################################################################
-.section .multiboot.data, "aw"
+.section .data.multiboot, "aw"
 .align 4
 .long MAGIC
 .long FLAGS
@@ -24,7 +24,7 @@
 ###############################################################################
 
 # The kernel entry point.
-.section .multiboot.text, "a"
+.section .text.multiboot, "a"
 .global _start
 .type _start, @function
 _start:
