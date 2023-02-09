@@ -40,7 +40,7 @@ SECTIONS
     {
         *(COMMON)
         *(.bss)
-        *(.bootstrap_stack)
+        *(.kernel_stack)
     }
 
     _kernel_end = .;

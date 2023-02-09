@@ -136,7 +136,7 @@ g_page_table_C0000000:
 ###############################################################################
 # Kernel stack
 ###############################################################################
-.section .bootstrap_stack, "aw", @nobits
+.section .kernel_stack, "aw", @nobits
 stack_bottom:
 .skip 8 * 1024 # 8 KiB
 stack_top:
