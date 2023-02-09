@@ -28,18 +28,37 @@
 .global _start
 .type _start, @function
 _start:
-    # Physical address of boot_page_table1.
-    # TODO: I recall seeing some assembly that used a macro to do the
-    #       conversions to and from physical. Maybe this should be done in this
-    #       code as well?
+###############################################################################
+# Setup 00000000 page table (identity map of the first 1mb)
+###############################################################################
+
+    movl $(g_page_table_00000000 - KERNEL_START_OFFSET), %edi # Page table address
+    movl $0, %esi # Page table value
+
+    movl %esi, %edx
+    orl $0x003, %edx
+    movl %edx, (%edi)
+
+1:
+    # if we're at the end of the page table, stop; otherwise write the next entry
+    cmpl $(g_page_table_00000000 - KERNEL_START_OFFSET + 4096), %edi
+    jge 2f
+
+    movl %esi, %edx
+    orl $0x003, %edx
+    movl %edx, (%edi)
+    addl $4096, %esi
+    addl $4, %edi
+    loop 1b
+
+2:
+
+###############################################################################
+# Setup C0000000 page table (kernel map)
+###############################################################################
+
     movl $(g_page_table_C0000000 - KERNEL_START_OFFSET), %edi
-    # First address to map is address 0.
-    # TODO: Start at the first kernel page instead. Alternatively map the first
-    #       1 MiB as it can be generally useful, and there's no need to
-    #       specially map the VGA buffer.
     movl $0, %esi
-    # Map 1023 pages. The 1024th will be the VGA text buffer.
-    movl $1023, %ecx
 
 1:
     # Only map the kernel.
@@ -63,22 +82,9 @@ _start:
     loop 1b
 
 3:
-    # Map VGA video memory to 0xC03FF000 as "present, writable".
-    movl $(0x000B8000 | 0x003), g_page_table_C0000000 - KERNEL_START_OFFSET + 1023 * 4
-
-    # The page table is used at both page directory entry 0 (virtually from 0x0
-    # to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
-    # 768 (virtually from 0xC0000000 to 0xC03FFFFF) (thus mapping it in the
-    # higher half). The kernel is identity mapped because enabling paging does
-    # not change the next instruction, which continues to be physical. The CPU
-    # would instead page fault if there was no identity mapping.
-
-    # Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
-    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET + 0
+    # Temporarily identity map the kernel to 00000000 until we can actually long jump into the upper half
+    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET
     movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET + 768 * 4
-
-    # Map the whole identity of memory to 0xD0000000
-    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET + 0
 
     # Set cr3 to the address of the boot_page_directory.
     movl $(g_page_directory - KERNEL_START_OFFSET), %ecx
@@ -96,10 +102,9 @@ _start:
 .section .text
 
 4:
-    # At this point, paging is fully set up and enabled.
-
-    # Unmap the identity mapping as it is now unnecessary.
-    movl $0, g_page_directory + 0
+    # The longjump happened; we can now safely use the 1mb identity map instead since the kernel only needs
+    # the C0000000 map from now on.
+    movl $(g_page_table_00000000 - KERNEL_START_OFFSET + 0x003), g_page_directory + 0
 
     # Reload crc3 to force a TLB flush so the changes to take effect.
     movl %cr3, %ecx
@@ -109,6 +114,8 @@ _start:
     mov $stack_top, %esp
 
     # Enter the high-level kernel.
+    pushl %ebx # Info struct ptr
+    pushl %eax # Multiboot magic number
     call kernel_main
 
     # Infinite loop if the system has nothing more to do.
@@ -123,13 +130,13 @@ _start:
     .align 4096
 .global g_page_directory
 g_page_directory:
-    .skip 4096
+    .skip 4 * 1024
 .global g_page_table_00000000
 g_page_table_00000000:
-    .skip 4096
+    .skip 4 * 1024
 .global g_page_table_C0000000
 g_page_table_C0000000:
-    .skip 4096
+    .skip 4 * 1024
 
 ###############################################################################
 
