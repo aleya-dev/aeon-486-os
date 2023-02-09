@@ -10,6 +10,14 @@
 
 .set KERNEL_START_OFFSET, 0xC0000000
 
+# Page table flags
+.set PTF_PRESENT,      1<<0
+.set PTF_READ_WRITE,   1<<1
+
+# Page directory flags
+.set PDF_PRESENT,      1<<0
+.set PDF_READ_WRITE,   1<<1
+
 ###############################################################################
 
 ###############################################################################
@@ -35,9 +43,9 @@ _start:
     movl $(g_page_table_00000000 - KERNEL_START_OFFSET), %edi # Page table address
     movl $0, %esi # Page table value
 
-    movl %esi, %edx
-    orl $0x003, %edx
-    movl %edx, (%edi)
+    movl %esi, %edx                        # Copy the current address
+    orl PTF_PRESENT | PTF_READ_WRITE, %edx # Write the flags
+    movl %edx, (%edi)                      # Write address+flags in the page table
 
 1:
     # if we're at the end of the page table, stop; otherwise write the next entry
@@ -83,8 +91,8 @@ _start:
 
 3:
     # Temporarily identity map the kernel to 00000000 until we can actually long jump into the upper half
-    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET
-    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET + 768 * 4
+    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET
+    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET + 768 * 4
 
     # Set cr3 to the address of the boot_page_directory.
     movl $(g_page_directory - KERNEL_START_OFFSET), %ecx
@@ -104,7 +112,7 @@ _start:
 4:
     # The longjump happened; we can now safely use the 1mb identity map instead since the kernel only needs
     # the C0000000 map from now on.
-    movl $(g_page_table_00000000 - KERNEL_START_OFFSET + 0x003), g_page_directory + 0
+    movl $(g_page_table_00000000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory + 0
 
     # Reload crc3 to force a TLB flush so the changes to take effect.
     movl %cr3, %ecx
