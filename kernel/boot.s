@@ -1,4 +1,6 @@
-# Declare constants for the multiboot header.
+###############################################################################
+# Constants
+###############################################################################
 .set ALIGN,    1<<0                      # align loaded modules on page boundaries
 .set MEMINFO,  1<<1                      # provide memory map
 .set CMDLINE,  1<<2                      # provide the kernel commandline info
@@ -8,29 +10,18 @@
 
 .set KERNEL_START_OFFSET, 0xC0000000
 
-# Declare a multiboot header that marks the program as a kernel.
+###############################################################################
+
+###############################################################################
+# Multiboot header
+###############################################################################
 .section .multiboot.data, "aw"
 .align 4
 .long MAGIC
 .long FLAGS
 .long CHECKSUM
 
-# Allocate the initial stack.
-.section .bootstrap_stack, "aw", @nobits
-stack_bottom:
-.skip 8 * 1024 # 8 KiB
-stack_top:
-
-# Preallocate pages used for paging. Don't hard-code addresses and assume they
-# are available, as the bootloader might have loaded its multiboot structures or
-# modules there. This lets the bootloader know it must avoid the addresses.
-.section .bss, "aw", @nobits
-    .align 4096
-boot_page_directory:
-    .skip 4096
-boot_page_table1:
-    .skip 4096
-# Further page tables may be required if the kernel grows beyond 3 MiB.
+###############################################################################
 
 # The kernel entry point.
 .section .multiboot.text, "a"
@@ -41,7 +32,7 @@ _start:
     # TODO: I recall seeing some assembly that used a macro to do the
     #       conversions to and from physical. Maybe this should be done in this
     #       code as well?
-    movl $(boot_page_table1 - KERNEL_START_OFFSET), %edi
+    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET), %edi
     # First address to map is address 0.
     # TODO: Start at the first kernel page instead. Alternatively map the first
     #       1 MiB as it can be generally useful, and there's no need to
@@ -73,7 +64,7 @@ _start:
 
 3:
     # Map VGA video memory to 0xC03FF000 as "present, writable".
-    movl $(0x000B8000 | 0x003), boot_page_table1 - KERNEL_START_OFFSET + 1023 * 4
+    movl $(0x000B8000 | 0x003), g_page_table_C0000000 - KERNEL_START_OFFSET + 1023 * 4
 
     # The page table is used at both page directory entry 0 (virtually from 0x0
     # to 0x3FFFFF) (thus identity mapping the kernel) and page directory entry
@@ -83,11 +74,14 @@ _start:
     # would instead page fault if there was no identity mapping.
 
     # Map the page table to both virtual addresses 0x00000000 and 0xC0000000.
-    movl $(boot_page_table1 - KERNEL_START_OFFSET + 0x003), boot_page_directory - KERNEL_START_OFFSET + 0
-    movl $(boot_page_table1 - KERNEL_START_OFFSET + 0x003), boot_page_directory - KERNEL_START_OFFSET + 768 * 4
+    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET + 0
+    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET + 768 * 4
+
+    # Map the whole identity of memory to 0xD0000000
+    movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + 0x003), g_page_directory - KERNEL_START_OFFSET + 0
 
     # Set cr3 to the address of the boot_page_directory.
-    movl $(boot_page_directory - KERNEL_START_OFFSET), %ecx
+    movl $(g_page_directory - KERNEL_START_OFFSET), %ecx
     movl %ecx, %cr3
 
     # Enable paging and the write-protect bit.
@@ -105,7 +99,7 @@ _start:
     # At this point, paging is fully set up and enabled.
 
     # Unmap the identity mapping as it is now unnecessary.
-    movl $0, boot_page_directory + 0
+    movl $0, g_page_directory + 0
 
     # Reload crc3 to force a TLB flush so the changes to take effect.
     movl %cr3, %ecx
@@ -121,3 +115,29 @@ _start:
     cli
 1:      hlt
     jmp 1b
+
+###############################################################################
+# Page tables
+###############################################################################
+.section .bss, "aw", @nobits
+    .align 4096
+.global g_page_directory
+g_page_directory:
+    .skip 4096
+.global g_page_table_00000000
+g_page_table_00000000:
+    .skip 4096
+.global g_page_table_C0000000
+g_page_table_C0000000:
+    .skip 4096
+
+###############################################################################
+
+###############################################################################
+# Kernel stack
+###############################################################################
+.section .bootstrap_stack, "aw", @nobits
+stack_bottom:
+.skip 8 * 1024 # 8 KiB
+stack_top:
+###############################################################################
