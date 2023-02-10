@@ -42,13 +42,14 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   multiboot_info_t *mbi;
   multiboot_memory_map_t *mbmm;
 
+  gdt_init ();
+
   display_t *display = textmode_init ();
   display->clear ();
   display_register (display);
 
   kprintf ("Now booting AEON\n");
 
-  gdt_init ();
   idt_init ();
   irq_init ();
 
