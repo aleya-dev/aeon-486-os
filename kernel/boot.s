@@ -93,6 +93,8 @@ _start:
     loop 1b
 
 3:
+    movl $(0x000B8000 | 0x003), g_page_table_C0000000 - KERNEL_START_OFFSET + 1023 * 4
+
     # Temporarily identity map the kernel to 00000000 until we can actually long jump into the upper half
     movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET
     movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET + 768 * 4
