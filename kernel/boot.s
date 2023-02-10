@@ -14,6 +14,9 @@
 .set PTF_PRESENT,      1<<0
 .set PTF_READ_WRITE,   1<<1
 
+# Page table OS specific flags
+.set PTF_AEON_LOCKED,  1<<11 # The page should never be unpaged. It belongs to the kernel
+
 # Page directory flags
 .set PDF_PRESENT,      1<<0
 .set PDF_READ_WRITE,   1<<1
@@ -43,9 +46,9 @@ _start:
     movl $(g_page_table_00000000 - KERNEL_START_OFFSET), %edi # Page table address
     movl $0, %esi # Page table value
 
-    movl %esi, %edx                        # Copy the current address
-    orl PTF_PRESENT | PTF_READ_WRITE, %edx # Write the flags
-    movl %edx, (%edi)                      # Write address+flags in the page table
+    movl %esi, %edx                                             # Copy the current address
+    orl $(PTF_PRESENT | PTF_READ_WRITE | PTF_AEON_LOCKED), %edx # Write the flags
+    movl %edx, (%edi)                                           # Write address+flags in the page table
 
 1:
     # if we're at the end of the page table, stop; otherwise write the next entry
@@ -78,7 +81,7 @@ _start:
     # Map physical address as "present, writable". Note that this maps
     # .text and .rodata as writable. Mind security and map them as non-writable.
     movl %esi, %edx
-    orl $0x003, %edx
+    orl $(PTF_PRESENT | PTF_READ_WRITE | PTF_AEON_LOCKED), %edx
     movl %edx, (%edi)
 
 2:
