@@ -17,6 +17,10 @@ add_executable(kernel.bin
     platform/i386/gdt.h
     platform/i386/irq.c
     platform/i386/irq.h
+    memory/memory.c
+    memory/memory.h
+    memory/paging.c
+    memory/paging.h
     lib/mutex.c
     lib/hexdump.c
     lib/hexdump.h

@@ -96,6 +96,8 @@ _start:
     # Temporarily identity map the kernel to 00000000 until we can actually long jump into the upper half
     movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET
     movl $(g_page_table_C0000000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET + 768 * 4
+    movl $(g_page_table_C0400000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET + 769 * 4
+    movl $(g_page_table_C0800000 - KERNEL_START_OFFSET + PDF_PRESENT + PDF_READ_WRITE), g_page_directory - KERNEL_START_OFFSET + 770 * 4
 
     # Set cr3 to the address of the boot_page_directory.
     movl $(g_page_directory - KERNEL_START_OFFSET), %ecx
@@ -147,6 +149,12 @@ g_page_table_00000000:
     .skip 4 * 1024
 .global g_page_table_C0000000
 g_page_table_C0000000:
+    .skip 4 * 1024
+.global g_page_table_C0400000
+g_page_table_C0400000:
+    .skip 4 * 1024
+.global g_page_table_C0800000
+g_page_table_C0800000:
     .skip 4 * 1024
 
 ###############################################################################
