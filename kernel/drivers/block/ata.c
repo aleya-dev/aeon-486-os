@@ -607,7 +607,7 @@ ata_probe (void)
     kprintf ("Device: %s\n", str);
     identify_device_data_t *blah = ide_buf;
 
-    khexdump (ide_buf, sizeof (ide_buf));
+    //khexdump (ide_buf, sizeof (ide_buf));
 
     (void)blah;
   }
