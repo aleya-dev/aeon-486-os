@@ -1,1 +1,7 @@
-qemu-system-i386 --kernel build_i486_debug/kernel.bin -no-reboot -d cpu_reset -s -hda hdd.img
+qemu-system-i386 \
+    -no-reboot \
+    -d cpu_reset \
+    -m size=8,maxmem=0x800000 \
+    -s \
+    -hda hdd.img #\
+#    --kernel ./build_i486_debug/kernel.bin
