@@ -1,4 +1,5 @@
 #include "memory.h"
+#include <drivers/display/display.h>
 #include <platform/i386/hal.h>
 
 kuint32_t
@@ -15,6 +16,13 @@ mem_get_bytes (void)
 
   total = lowmem | highmem << 8;
   return total * 1024;
+}
+
+void
+mem_print_info (void)
+{
+  const kuint32_t bytes = mem_get_bytes ();
+  kprintf ("Memory size: %i bytes (%i KiB)\n", bytes, bytes / 1024);
 }
 
 kuint32_t

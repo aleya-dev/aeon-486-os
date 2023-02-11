@@ -53,7 +53,7 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   idt_init ();
   irq_init ();
 
-  kprintf ("Memory size (cmos): %i\n", mem_get_bytes ());
+  mem_print_info ();
 
   ata_init ();
 
