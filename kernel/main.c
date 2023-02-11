@@ -48,7 +48,9 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   display->clear ();
   display_register (display);
 
-  kprintf ("Now booting AEON\n");
+  kprintf ("Now booting AEON 0.0.1\n");
+
+  kprintf ("Magic: %x Addr: %x\n", magic, addr);
 
   idt_init ();
   irq_init ();
@@ -57,6 +59,9 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   mbmm = page_physical_address ((void *)mbi->mmap_addr,
                                 sizeof (multiboot_memory_map_t)
                                     * mbi->mmap_length);
+
+  kprintf ("Mem lower: %x, upper: %x\n", mbi->mem_lower, mbi->mem_upper);
+  kprintf ("Boot dev: %x\n", mbi->boot_device);
 
   int i;
   for (i = 0; i < mbi->mmap_length; i += sizeof (multiboot_memory_map_t))
