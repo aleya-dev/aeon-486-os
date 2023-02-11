@@ -2,7 +2,6 @@
 #include "drivers/display/display.h"
 #include "drivers/display/textmode.h"
 #include "memory/memory.h"
-#include "memory/paging.h"
 #include "multiboot.h"
 #include "platform/i386/gdt.h"
 #include "platform/i386/hal.h"
