@@ -1,13 +1,12 @@
 ###############################################################################
 # Constants
 ###############################################################################
-.set ALIGN,    1<<0                      # align loaded modules on page boundaries
-.set MEMINFO,  1<<1                      # provide memory map
-.set CMDLINE,  1<<2                      # provide the kernel commandline info
+.set ALIGN,    1<<0             # align loaded modules on page boundaries
+.set MEMINFO,  1<<1             # provide memory map
 
-.set FLAGS,    ALIGN | MEMINFO | CMDLINE # this is the Multiboot 'flag' field
-.set MAGIC,    0x1BADB002                # 'magic number' lets bootloader find the header
-.set CHECKSUM, -(MAGIC + FLAGS)          # checksum of above, to prove we are multiboot
+.set FLAGS,    ALIGN | MEMINFO  # this is the Multiboot 'flag' field
+.set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
+.set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
 
 .set KERNEL_START_OFFSET, 0xC0000000
 
