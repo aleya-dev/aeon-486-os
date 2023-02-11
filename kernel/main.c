@@ -49,8 +49,10 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   display->clear ();
   display_register (display);
 
-  kprintf ("Now booting AEON 0.0.1\n");
+  if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
+    panic ("Multiboot magic invalid: %x", magic);
 
+  kprintf ("Now booting AEON 0.0.1\n");
   kprintf ("Magic: %x Addr: %x\n", magic, addr);
 
   idt_init ();
