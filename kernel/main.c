@@ -30,7 +30,7 @@ play_sound (kuint32_t nFrequence)
 }
 
 static void
-nosound ()
+nosound (void)
 {
   kint8_t tmp = inportb (0x61) & 0xFC;
   outportb (0x61, tmp);
