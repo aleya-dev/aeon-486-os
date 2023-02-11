@@ -1,6 +1,8 @@
 #include "drivers/block/ata.h"
 #include "drivers/display/display.h"
 #include "drivers/display/textmode.h"
+#include "memory/memory.h"
+#include "memory/paging.h"
 #include "multiboot.h"
 #include "platform/i386/gdt.h"
 #include "platform/i386/hal.h"
@@ -36,21 +38,6 @@ nosound ()
   outportb (0x61, tmp);
 }
 
-static kuint32_t
-memsize (void)
-{
-  unsigned short total;
-  unsigned char lowmem, highmem;
-
-  outportb (0x70, 0x30);
-  lowmem = inportb (0x71);
-  outportb (0x70, 0x31);
-  highmem = inportb (0x71);
-
-  total = lowmem | highmem << 8;
-  return total;
-}
-
 void
 kernel_main (const kuint32_t magic, const kuint32_t addr)
 {
@@ -76,7 +63,7 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
 
   unpage (mbi);
 
-  kprintf ("Memory size (cmos): %i\n", memsize ());
+  kprintf ("Memory size (cmos): %i\n", mem_get_bytes ());
 
   ata_init ();
 
