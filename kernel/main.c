@@ -8,8 +8,6 @@
 #include "platform/i386/hal.h"
 #include "platform/i386/idt.h"
 #include "platform/i386/irq.h"
-#include <lib/hexdump.h>
-#include <memory/paging.h>
 
 static void
 play_sound (kuint32_t nFrequence)
@@ -41,8 +39,6 @@ nosound ()
 void
 kernel_main (const kuint32_t magic, const kuint32_t addr)
 {
-  multiboot_info_t *mbi;
-
   gdt_init ();
 
   display_t *display = textmode_init ();
@@ -53,17 +49,9 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
     panic ("Multiboot magic invalid: %x", magic);
 
   kprintf ("Now booting AEON 0.0.1\n");
-  kprintf ("Magic: %x Addr: %x\n", magic, addr);
 
   idt_init ();
   irq_init ();
-
-  mbi = page (addr, sizeof (multiboot_info_t)*50000, 0);
-
-  kprintf ("Mem lower: %x, upper: %x\n", mbi->mem_lower, mbi->mem_upper);
-  kprintf ("Boot dev: %x\n", mbi->boot_device);
-
-  unpage (mbi);
 
   kprintf ("Memory size (cmos): %i\n", mem_get_bytes ());
 
