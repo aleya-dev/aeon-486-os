@@ -3,5 +3,4 @@ qemu-system-i386 \
     -d cpu_reset \
     -m size=8,maxmem=0x800000 \
     -s \
-    -hda hdd.img \
-    --kernel ./build_i486_debug/kernel.bin
+    -hda hdd.img
