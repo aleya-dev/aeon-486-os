@@ -27,7 +27,7 @@
 ###############################################################################
 # Multiboot header
 ###############################################################################
-.section .data.multiboot, "aw"
+.section .rodata.multiboot, "aw"
 .align 4
 .long MAGIC
 .long FLAGS

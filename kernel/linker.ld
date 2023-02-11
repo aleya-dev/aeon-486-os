@@ -9,9 +9,9 @@ SECTIONS
 
     _kernel_start = .;
 
-    .data.multiboot :
+    .rodata.multiboot :
     {
-        *(.data.multiboot)
+        *(.rodata.multiboot)
     }
 
     .text.multiboot :
