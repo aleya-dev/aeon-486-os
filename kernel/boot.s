@@ -11,15 +11,16 @@
 .set KERNEL_START_OFFSET, 0xC0000000
 
 # Page table flags
-.set PTF_PRESENT,      1<<0
-.set PTF_READ_WRITE,   1<<1
+.set PTF_PRESENT,             1<<0
+.set PTF_READ_WRITE,          1<<1
+.set PTF_CACHE_WRITE_THROUGH, 1<<3
 
 # Page table OS specific flags
-.set PTF_AEON_LOCKED,  1<<11 # The page should never be unpaged. It belongs to the kernel
+.set PTF_AEON_LOCKED,         1<<11 # The page should never be unpaged. It belongs to the kernel
 
 # Page directory flags
-.set PDF_PRESENT,      1<<0
-.set PDF_READ_WRITE,   1<<1
+.set PDF_PRESENT,             1<<0
+.set PDF_READ_WRITE,          1<<1
 
 ###############################################################################
 
@@ -47,7 +48,10 @@ _start:
     movl $0, %esi # Page table value
 
     movl %esi, %edx                                             # Copy the current address
-    orl $(PTF_PRESENT | PTF_READ_WRITE | PTF_AEON_LOCKED), %edx # Write the flags
+
+    # Write the flags. Enable cache write-through since this table is mostly used for
+    # memory mapped hardware (vga, etc.)
+    orl $(PTF_PRESENT | PTF_READ_WRITE | PTF_CACHE_WRITE_THROUGH | PTF_AEON_LOCKED), %edx
     movl %edx, (%edi)                                           # Write address+flags in the page table
 
 1:
