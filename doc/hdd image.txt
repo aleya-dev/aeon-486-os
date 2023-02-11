@@ -12,7 +12,7 @@ t            # Set type
 w            # Write
 
 sudo losetup -P /dev/loop0 hdd.img
-sudo mkfs.fat -F 32 /dev/loop0p1
+sudo mkfs.fat -F 32 /dev/loop0p1 -n AEONOS
 
 sudo mkdir /mnt/hdd
 sudo mount /dev/loop0p1 /mnt/hdd
