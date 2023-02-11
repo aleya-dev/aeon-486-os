@@ -3,10 +3,8 @@
 
 #include <klibc/types.h>
 
-void *
-align (void *ptr, kuint32_t align);
+kuint32_t align (const kuint32_t ptr, const kuint32_t align);
 
-void *
-page_align (void *ptr);
+kuint32_t page_align (const kuint32_t ptr);
 
 #endif /* MEMORY_H */

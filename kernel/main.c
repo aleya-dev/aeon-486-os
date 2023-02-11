@@ -36,11 +36,25 @@ nosound ()
   outportb (0x61, tmp);
 }
 
+static kuint32_t
+memsize (void)
+{
+  unsigned short total;
+  unsigned char lowmem, highmem;
+
+  outportb (0x70, 0x30);
+  lowmem = inportb (0x71);
+  outportb (0x70, 0x31);
+  highmem = inportb (0x71);
+
+  total = lowmem | highmem << 8;
+  return total;
+}
+
 void
 kernel_main (const kuint32_t magic, const kuint32_t addr)
 {
   multiboot_info_t *mbi;
-  multiboot_memory_map_t *mbmm;
 
   gdt_init ();
 
@@ -55,25 +69,14 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   idt_init ();
   irq_init ();
 
-  mbi = page_physical_address ((void *)addr, sizeof (multiboot_info_t));
-  mbmm = page_physical_address ((void *)mbi->mmap_addr,
-                                sizeof (multiboot_memory_map_t)
-                                    * mbi->mmap_length);
+  mbi = page (addr, sizeof (multiboot_info_t)*50000, 0);
 
   kprintf ("Mem lower: %x, upper: %x\n", mbi->mem_lower, mbi->mem_upper);
   kprintf ("Boot dev: %x\n", mbi->boot_device);
 
-  int i;
-  for (i = 0; i < mbi->mmap_length; i += sizeof (multiboot_memory_map_t))
-    {
-      multiboot_memory_map_t *mmmt = &mbmm[i];
+  unpage (mbi);
 
-      // if (mmmt->type == MULTIBOOT_MEMORY_AVAILABLE)
-      {
-        kprintf ("Addr: %x | Len: %x | Size: %x | Type: %d\n", mmmt->addr,
-                 mmmt->len, mmmt->size, mmmt->type);
-      }
-    }
+  kprintf ("Memory size (cmos): %i\n", memsize ());
 
   ata_init ();
 
