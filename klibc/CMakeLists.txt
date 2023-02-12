@@ -4,12 +4,13 @@ add_library(klibc OBJECT
     private/stdlib.c
     private/string.c
     public/klibc/ctype.h
+    public/klibc/math.h
     public/klibc/memory.h
+    public/klibc/stdbool.h
+    public/klibc/stddef.h
     public/klibc/stdlib.h
     public/klibc/string.h
     public/klibc/types.h
-    public/klibc/stddef.h
-    public/klibc/math.h
 )
 
 set_target_properties(klibc PROPERTIES
