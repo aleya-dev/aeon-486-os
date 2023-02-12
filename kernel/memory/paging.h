@@ -64,4 +64,10 @@ void *page_unaligned (const kuint32_t physical_address, const ksize_t size,
  */
 kuint32_t unpage (void *address);
 
+/* Take a page aligned virtual address and return the physical address.
+ * If the given address is not page aligned, the returned address will
+ * still be 4k page aligned downward.
+ */
+kuint32_t get_physical_address(void *virt_address);
+
 #endif /* PAGING_H */

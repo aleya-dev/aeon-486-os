@@ -236,3 +236,29 @@ unpage (void *virt_address)
 
   return page_count;
 }
+
+kuint32_t
+get_physical_address (void *virt_address)
+{
+  /* Find the correct page directory and table index
+   * AAAAAAAAAA         BBBBBBBBBB        CCCCCCCCCCCC
+   * directory index    page table index  offset into page
+   */
+  const kuint32_t page_directory_index
+      = (((kuint32_t)virt_address) >> 22) & 0x3ff;
+  const kuint32_t page_table_index = (((kuint32_t)virt_address) >> 12) & 0x3ff;
+
+  /* Is the page table within kernel space? */
+  if (page_directory_index >= KERNEL_FIRST_PAGE_TABLE_OFFSET)
+    {
+      return g_page_table_C0000000[(page_directory_index
+                                    - KERNEL_FIRST_PAGE_TABLE_OFFSET)
+                                       * PAGE_TABLE_LEN
+                                   + page_table_index];
+    }
+  else
+    {
+      /* TODO: user space stuff */
+      return 0;
+    }
+}
