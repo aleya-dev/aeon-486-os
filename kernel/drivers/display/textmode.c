@@ -1,8 +1,9 @@
 #include "textmode.h"
 #include <klibc/memory.h>
+#include <platform/i386/hal.h>
 
 #define VGA_MEMORY 0xB8000
-//#define VGA_MEMORY 0xC03FF000
+// #define VGA_MEMORY 0xC03FF000
 #define TEXTMODE_WIDTH 80
 #define TEXTMODE_HEIGHT 25
 
@@ -56,6 +57,17 @@ textmode_clear (void)
   display.console.cy = 0;
 }
 
+static void
+textmode_update_cursor (const kuint32_t x, const kuint32_t y)
+{
+  kuint16_t pos = y * TEXTMODE_WIDTH + x;
+
+  outportb (0x3D4, 0x0F);
+  outportb (0x3D5, (kuint8_t)(pos & 0xFF));
+  outportb (0x3D4, 0x0E);
+  outportb (0x3D5, (kuint8_t)((pos >> 8) & 0xFF));
+}
+
 void
 textmode_putc (const char c)
 {
@@ -83,6 +95,8 @@ textmode_putc (const char c)
       c, textmode_make_color (display.console.fgcol, display.console.bgcol));
 
   display.console.cx++;
+
+  textmode_update_cursor (display.console.cx, display.console.cy);
 }
 
 static void
