@@ -7,6 +7,16 @@
 #define PTF_READ_WRITE (1 << 1)
 #define PTF_USER (1 << 2)
 
+/* Look through all the kernel allocated pages to find the highest free
+ * physical address. This is used by the memory allocator to figure out how
+ * large the kernel is and where it can place dynamic memory allocations.
+ *
+ * This function will only yield correct results when the memory allocator
+ * is not used yet (so early in the kernel initialization); since it only
+ * checks the kernel pages for addresses (>= 0xC0000000).
+ */
+kuint32_t compute_highest_free_address (void);
+
 /* Take a 4k aligned physical address create one or more pages to access it
  * The pointer returned points to the given object in virtual memory with the
  * correct offset; so it can be used directly.

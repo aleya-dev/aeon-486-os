@@ -1,5 +1,6 @@
 #include "memory.h"
 #include <drivers/display/display.h>
+#include <memory/paging.h>
 #include <platform/i386/hal.h>
 
 kuint32_t
@@ -22,7 +23,10 @@ void
 mem_print_info (void)
 {
   const kuint32_t bytes = mem_get_bytes ();
+  const kuint32_t min_addr = compute_highest_free_address ();
+
   kprintf ("Memory size: %i bytes (%i KiB)\n", bytes, bytes / 1024);
+  kprintf ("First available address: %x\n", min_addr);
 }
 
 kuint32_t

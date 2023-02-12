@@ -1,6 +1,7 @@
 #include "paging.h"
 
 #include <drivers/display/display.h>
+#include <klibc/math.h>
 #include <klibc/stddef.h>
 #include <klibc/types.h>
 #include <memory/memory.h>
@@ -96,6 +97,24 @@ find_free_blocks_offset (const kuint32_t *page_table,
     }
 
   return OUT_OF_FREE_BLOCKS;
+}
+
+kuint32_t
+compute_highest_free_address (void)
+{
+  kuint32_t highest_address = 0;
+  kuint32_t i;
+
+  for (i = 0; i < KERNEL_PAGE_TABLES_LEN; ++i)
+    {
+
+      highest_address = MAX (highest_address, g_page_table_C0000000[i]);
+    }
+
+  /* The highest address in a page table is still a page being used.
+   * The first available free address is 4kb further.
+   */
+  return highest_address + PAGE_SIZE;
 }
 
 void *
