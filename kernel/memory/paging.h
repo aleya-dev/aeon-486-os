@@ -60,7 +60,8 @@ void *page_unaligned (const kuint32_t physical_address, const ksize_t size,
  * \param address The address to unpage. Must be a pointer returned by either
  *                page() or page_unaligned(). Any other pointer will cause
  *                undefined behavior.
+ * \return The amount of page table entries (4k blocks) that were unpaged
  */
-void unpage (void *address);
+kuint32_t unpage (void *address);
 
 #endif /* PAGING_H */

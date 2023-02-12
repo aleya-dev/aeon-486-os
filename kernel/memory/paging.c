@@ -190,9 +190,10 @@ page_unaligned (const kuint32_t physical_address, const ksize_t size,
   return (void *)(((kuint8_t *)virtual_address) + offset);
 }
 
-void
+kuint32_t
 unpage (void *virt_address)
 {
+  kuint32_t page_count;
   kuint32_t page_entry;
   kuint32_t *page_table_address;
 
@@ -200,8 +201,9 @@ unpage (void *virt_address)
    * AAAAAAAAAA         BBBBBBBBBB        CCCCCCCCCCCC
    * directory index    page table index  offset into page
    */
-  kuint32_t page_directory_index = (((kuint32_t)virt_address) >> 22) & 0x3ff;
-  kuint32_t page_table_index = (((kuint32_t)virt_address) >> 12) & 0x3ff;
+  const kuint32_t page_directory_index
+      = (((kuint32_t)virt_address) >> 22) & 0x3ff;
+  const kuint32_t page_table_index = (((kuint32_t)virt_address) >> 12) & 0x3ff;
 
   /* Is the page table within kernel space? */
   if (page_directory_index >= KERNEL_FIRST_PAGE_TABLE_OFFSET)
@@ -218,6 +220,7 @@ unpage (void *virt_address)
       page_table_address = NULL;
     }
 
+  page_count = 0;
   do
     {
       if (*page_table_address & PTF_AEON_LOCKED)
@@ -225,8 +228,11 @@ unpage (void *virt_address)
 
       page_entry = *page_table_address;
       *page_table_address = 0;
+      ++page_count;
     }
   while (page_entry & PTF_AEON_END_OF_BLOCK);
 
   pagetable_refresh ();
+
+  return page_count;
 }
