@@ -9,6 +9,7 @@ add_library(klibc OBJECT
     public/klibc/string.h
     public/klibc/types.h
     public/klibc/stddef.h
+    public/klibc/math.h
 )
 
 set_target_properties(klibc PROPERTIES
