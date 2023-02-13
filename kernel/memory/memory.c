@@ -3,9 +3,12 @@
 #include <drivers/display/display.h>
 #include <klibc/memory.h>
 #include <klibc/stdbool.h>
+#include <kmodule.h>
 #include <lib/hexdump.h>
 #include <memory/paging.h>
 #include <platform/i386/hal.h>
+
+kmodule (memory);
 
 typedef struct memory_allocator_t
 {
@@ -61,15 +64,19 @@ mem_print_info (void)
   const kuint32_t min_addr = compute_highest_free_address ();
 
   kprintf ("Memory size: %i bytes (%i KiB)\n", bytes, bytes / 1024);
-  kprintf ("First available address: %x\n", min_addr);
+  kprintf ("First available address: 0x%x\n", min_addr);
 }
 
 void
 mem_initialize (void)
 {
+  dbg ("Initializing memory\n");
+
   const kuint32_t min_address = compute_highest_free_address ();
   const kuint32_t max_address
       = mem_get_bytes (); /* TODO: Check for memory holes */
+
+  dbg (" - Min: 0x%x Max: 0x%x\n", min_address, max_address);
 
   /* Allocate the first free page for allocator bookkeeping.
    * TODO: If the system has too much memory, the bookkeeping won't
@@ -79,10 +86,14 @@ mem_initialize (void)
   g_memory_allocator = page (min_address, 4096, PTF_READ_WRITE);
   memset (g_memory_allocator, 0, 4096);
 
+  dbg (" - g_memory_allocator = 0x%x\n", g_memory_allocator);
+
   g_memory_allocator->min_address = min_address + MEM_BLOCK_SIZE;
   g_memory_allocator->max_address = max_address;
   g_memory_allocator->block_count
       = (max_address - min_address) / MEM_BLOCK_SIZE;
+
+  dbg (" - Block Count = %i\n", g_memory_allocator->block_count);
 }
 
 static kuint32_t
@@ -150,8 +161,11 @@ mem_find_first_free_block_range (const ksize_t size)
 void *
 kmalloc (const ksize_t size)
 {
+  dbg ("kmalloc: %i bytes\n", size);
+
   kuint32_t i;
   kuint32_t physical_address;
+  void *virtual_address;
   const kuint32_t required_block_count = (size / MEM_BLOCK_SIZE) + 1;
   const kuint32_t free_block
       = mem_find_first_free_block_range (required_block_count);
@@ -159,23 +173,41 @@ kmalloc (const ksize_t size)
   if (free_block == OUT_OF_MEMORY)
     panic ("Out of physical memory.");
 
+  dbg (" - Block count: %i\n", required_block_count);
+  dbg (" - First free block: %i\n", free_block);
+
   for (i = 0; i < required_block_count; ++i)
     mem_memory_map_set (free_block + i);
 
   physical_address
       = g_memory_allocator->min_address + free_block * MEM_BLOCK_SIZE;
 
-  return page (physical_address, size, PTF_READ_WRITE);
+  dbg (" - Physical Address: 0x%x\n", physical_address);
+
+  virtual_address = page (physical_address, size, PTF_READ_WRITE);
+
+  dbg (" - Virtual Address: 0x%x\n", virtual_address);
+
+  return virtual_address;
 }
 
 kuint32_t
 kfree (void *ptr)
 {
+  dbg ("kfree: 0x%x\n", ptr);
+
   const kuint32_t physical_address = get_physical_address (ptr);
+
+  dbg ("Physical address: 0x%x\n", physical_address);
+
   const kuint32_t block_count = unpage (ptr);
+
+  dbg (" - Unpaged block count: %i\n", block_count);
 
   const kuint32_t frame
       = (g_memory_allocator->min_address - physical_address) / MEM_BLOCK_SIZE;
+
+  dbg (" - Start frame: %i\n", frame);
 
   for (kuint32_t i = 0; i < block_count; ++i)
     mem_memory_map_unset (frame + i);

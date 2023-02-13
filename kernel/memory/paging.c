@@ -4,7 +4,10 @@
 #include <klibc/math.h>
 #include <klibc/stddef.h>
 #include <klibc/types.h>
+#include <kmodule.h>
 #include <memory/memory.h>
+
+kmodule (paging);
 
 #define PTF_PRESENT (1 << 0)
 
@@ -111,6 +114,8 @@ compute_highest_free_address (void)
           = MAX (highest_address, (g_page_table_C0000000[i] & ~0xfff));
     }
 
+  dbg ("Last kernel address: %x\n", highest_address);
+
   /* The highest address in a page table is still a page being used.
    * The first available free address is 4kb further.
    */
@@ -127,6 +132,8 @@ page (const kuint32_t physical_address, const ksize_t size,
   kuint32_t i;
   kuint32_t *page_table;
   kuint32_t page_table_length;
+
+  dbg ("page: %x, size: %i\n", physical_address, size);
 
   /* Are we mapping to kernel or user space? */
   if (flags & PTF_USER)
@@ -147,6 +154,10 @@ page (const kuint32_t physical_address, const ksize_t size,
 
   if (page_offset == OUT_OF_FREE_BLOCKS)
     panic ("Out of page space.");
+
+  dbg (" - required_page_count: %i\n", required_page_count);
+  dbg (" - page_offset: %i\n", page_offset);
+  dbg (" - flags: 0x%x\n", flags);
 
   /* Create the pages */
   aligned_physical_address = physical_address;
@@ -181,6 +192,8 @@ page_unaligned (const kuint32_t physical_address, const ksize_t size,
   kuint32_t offset;
   void *virtual_address;
 
+  dbg ("Page unaligned: %x\n", physical_address);
+
   aligned_physical_address = page_align (physical_address);
   offset = (kuint32_t)physical_address - aligned_physical_address;
 
@@ -197,6 +210,8 @@ unpage (void *virt_address)
   kuint32_t page_entry;
   kuint32_t *page_table_address;
 
+  dbg ("Unpage: 0x%x\n", virt_address);
+
   /* Find the correct page directory and table index
    * AAAAAAAAAA         BBBBBBBBBB        CCCCCCCCCCCC
    * directory index    page table index  offset into page
@@ -205,14 +220,19 @@ unpage (void *virt_address)
       = (((kuint32_t)virt_address) >> 22) & 0x3ff;
   const kuint32_t page_table_index = (((kuint32_t)virt_address) >> 12) & 0x3ff;
 
+  dbg (" - Page dir index: %i\n", page_directory_index);
+  dbg (" - Page table index: %i\n", page_table_index);
+
   /* Is the page table within kernel space? */
   if (page_directory_index >= KERNEL_FIRST_PAGE_TABLE_OFFSET)
     {
-      page_table_address
-          = &g_page_table_C0000000[(page_directory_index
-                                    - KERNEL_FIRST_PAGE_TABLE_OFFSET)
-                                       * PAGE_TABLE_LEN
-                                   + page_table_index];
+      const kuint32_t offset
+          = (page_directory_index - KERNEL_FIRST_PAGE_TABLE_OFFSET)
+                * PAGE_TABLE_LEN
+            + page_table_index;
+
+      dbg (" - Kernel space; table offset: %i\n", offset);
+      page_table_address = &g_page_table_C0000000[offset];
     }
   else
     {
@@ -223,10 +243,15 @@ unpage (void *virt_address)
   page_count = 0;
   do
     {
+      // dbg (" - Unpaging 0x%x\n", *page_table_address);
+
       if (*page_table_address & PTF_AEON_LOCKED)
         panic ("Kernel tried to unpage a locked page.");
 
       page_entry = *page_table_address;
+
+      // dbg ("   - entry: 0x%x\n", page_entry);
+
       *page_table_address = 0;
       ++page_table_address;
       ++page_count;
