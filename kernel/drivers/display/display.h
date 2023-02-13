@@ -31,4 +31,20 @@ void kvprintf (const char *fmt, va_list ap);
     }                                                                         \
   while (0)
 
+#ifdef DEBUG
+#define dbg(...)                                                              \
+  do                                                                          \
+    {                                                                         \
+      kprintf ("[%s]: ", __s_module_name__);                                  \
+      kprintf (__VA_ARGS__);                                                  \
+    }                                                                         \
+  while (0)
+#else
+#define dbg(...)                                                              \
+  do                                                                          \
+    {                                                                         \
+    }                                                                         \
+  while (0)
+#endif
+
 #endif /* DISPLAY_H */
