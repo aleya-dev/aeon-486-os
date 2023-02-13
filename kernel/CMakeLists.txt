@@ -2,6 +2,7 @@ add_executable(kernel.bin
     boot.s
     main.c
     multiboot.h
+    kmodule.h
     drivers/block/ata.c
     drivers/block/ata.h
     drivers/display/display.c
