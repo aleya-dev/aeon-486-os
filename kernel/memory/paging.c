@@ -107,8 +107,8 @@ compute_highest_free_address (void)
 
   for (i = 0; i < KERNEL_PAGE_TABLES_LEN; ++i)
     {
-
-      highest_address = MAX (highest_address, g_page_table_C0000000[i]);
+      highest_address
+          = MAX (highest_address, (g_page_table_C0000000[i] & ~0x7ff));
     }
 
   /* The highest address in a page table is still a page being used.
