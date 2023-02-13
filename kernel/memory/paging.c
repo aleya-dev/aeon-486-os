@@ -228,9 +228,10 @@ unpage (void *virt_address)
 
       page_entry = *page_table_address;
       *page_table_address = 0;
+      ++page_table_address;
       ++page_count;
     }
-  while (page_entry & PTF_AEON_END_OF_BLOCK);
+  while (!(page_entry & PTF_AEON_END_OF_BLOCK));
 
   pagetable_refresh ();
 
