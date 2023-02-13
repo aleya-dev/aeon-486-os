@@ -70,7 +70,7 @@ mem_print_info (void)
 void
 mem_initialize (void)
 {
-  dbg ("Initializing memory\n");
+  kprintf ("Initializing memory allocator\n");
 
   const kuint32_t min_address = compute_highest_free_address ();
   const kuint32_t max_address
