@@ -53,6 +53,8 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   irq_init ();
 
   mem_print_info ();
+  mem_initialize ();
+
 
   ata_init ();
 
