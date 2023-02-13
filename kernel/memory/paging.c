@@ -255,7 +255,8 @@ get_physical_address (void *virt_address)
       return g_page_table_C0000000[(page_directory_index
                                     - KERNEL_FIRST_PAGE_TABLE_OFFSET)
                                        * PAGE_TABLE_LEN
-                                   + page_table_index];
+                                   + page_table_index]
+             & ~0xfff;
     }
   else
     {
