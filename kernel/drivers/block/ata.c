@@ -239,6 +239,38 @@ ata_print_single_info (const kuint8_t bus, const kuint8_t drive)
     }
 }
 
+static void
+ata_poll_status (const kuint16_t base_io)
+{
+  kuint8_t status;
+
+  for (int i = 0; i < 4; i++)
+    inportb (base_io + ATA_REG_ALTSTATUS);
+
+  do
+    {
+      status = inportb (base_io + ATA_REG_STATUS);
+    }
+  while (status & ATA_SR_BSY);
+
+  do
+    {
+      status = inportb (base_io + ATA_REG_STATUS);
+
+      if (status & ATA_SR_ERR)
+        panic ("ATA device failure.\n");
+    }
+  while (!(status & ATA_SR_DRQ));
+}
+
+static void
+ata_delay (const kuint16_t base_io)
+{
+  kuint32_t i;
+  for (i = 0; i < 4; i++)
+    inportb (base_io + ATA_REG_ALTSTATUS);
+}
+
 void
 ata_print_info (void)
 {
@@ -246,4 +278,36 @@ ata_print_info (void)
   ata_print_single_info (ATA_PRIMARY, ATA_SLAVE);
   ata_print_single_info (ATA_SECONDARY, ATA_MASTER);
   ata_print_single_info (ATA_SECONDARY, ATA_SLAVE);
+}
+
+void
+ata_read_sector (const kuint8_t bus, const kuint8_t drive, const kuint32_t lba,
+                 kuint8_t *dst)
+{
+  kuint32_t i;
+  kuint16_t base_io;
+  const kuint8_t device_select = (drive == ATA_MASTER ? 0xE0 : 0xF0);
+
+  if (bus == ATA_PRIMARY)
+    base_io = ATA_PRIMARY_IO;
+  else
+    base_io = ATA_SECONDARY_IO;
+
+  outportb (base_io + ATA_REG_HDDEVSEL,
+            (device_select | (kuint8_t)((lba >> 24 & 0x0F))));
+  outportb (base_io + 1, 0x00);
+  outportb (base_io + ATA_REG_SECCOUNT0, 1);
+  outportb (base_io + ATA_REG_LBA0, (kuint8_t)((lba)));
+  outportb (base_io + ATA_REG_LBA1, (kuint8_t)((lba) >> 8));
+  outportb (base_io + ATA_REG_LBA2, (kuint8_t)((lba) >> 16));
+  outportb (base_io + ATA_REG_COMMAND, ATA_CMD_READ_PIO);
+
+  ata_poll_status (base_io);
+
+  for (i = 0; i < 256; i++)
+    {
+      *(kuint16_t *)(dst + i * 2) = inportw (base_io + ATA_REG_DATA);
+    }
+
+  ata_delay (base_io);
 }

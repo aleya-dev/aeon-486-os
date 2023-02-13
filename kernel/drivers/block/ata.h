@@ -416,5 +416,7 @@ typedef struct identify_device_data_t
 
 void ata_init (void);
 void ata_print_info (void);
+void ata_read_sector (const kuint8_t bus, const kuint8_t drive,
+                      const kuint32_t lba, kuint8_t *dst);
 
 #endif
