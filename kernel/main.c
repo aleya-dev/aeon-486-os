@@ -55,8 +55,8 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
   mem_print_info ();
   mem_initialize ();
 
-
   ata_init ();
+  ata_print_info ();
 
   kprintf ("Done!\n");
 }
