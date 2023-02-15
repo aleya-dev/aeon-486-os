@@ -45,6 +45,15 @@ extern kuint32_t g_page_table_C0800000[PAGE_TABLE_LEN];
 
 #define OUT_OF_FREE_BLOCKS 0xffffffff
 
+/* Find the correct page directory and table index
+ * AAAAAAAAAA         BBBBBBBBBB        CCCCCCCCCCCC
+ * directory index    page table index  offset into page
+ */
+#define PAGE_DIR_INDEX(virt_address)                                          \
+  ((((kuint32_t)virt_address) >> 22) & 0x3ff)
+#define PAGE_TABLE_INDEX(virt_address)                                        \
+  ((((kuint32_t)virt_address) >> 12) & 0x3ff)
+
 /* Refresh the current page directory */
 static void
 pagetable_refresh (void)
@@ -212,13 +221,8 @@ unpage (void *virt_address)
 
   dbg ("Unpage: 0x%x\n", virt_address);
 
-  /* Find the correct page directory and table index
-   * AAAAAAAAAA         BBBBBBBBBB        CCCCCCCCCCCC
-   * directory index    page table index  offset into page
-   */
-  const kuint32_t page_directory_index
-      = (((kuint32_t)virt_address) >> 22) & 0x3ff;
-  const kuint32_t page_table_index = (((kuint32_t)virt_address) >> 12) & 0x3ff;
+  const kuint32_t page_directory_index = PAGE_DIR_INDEX (virt_address);
+  const kuint32_t page_table_index = PAGE_TABLE_INDEX (virt_address);
 
   dbg (" - Page dir index: %i\n", page_directory_index);
   dbg (" - Page table index: %i\n", page_table_index);
@@ -266,13 +270,8 @@ unpage (void *virt_address)
 kuint32_t
 get_physical_address (void *virt_address)
 {
-  /* Find the correct page directory and table index
-   * AAAAAAAAAA         BBBBBBBBBB        CCCCCCCCCCCC
-   * directory index    page table index  offset into page
-   */
-  const kuint32_t page_directory_index
-      = (((kuint32_t)virt_address) >> 22) & 0x3ff;
-  const kuint32_t page_table_index = (((kuint32_t)virt_address) >> 12) & 0x3ff;
+  const kuint32_t page_directory_index = PAGE_DIR_INDEX (virt_address);
+  const kuint32_t page_table_index = PAGE_TABLE_INDEX (virt_address);
 
   /* Is the page table within kernel space? */
   if (page_directory_index >= KERNEL_FIRST_PAGE_TABLE_OFFSET)
