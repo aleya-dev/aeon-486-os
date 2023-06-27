@@ -25,9 +25,13 @@ add_executable(kernel.bin
     lib/mutex.c
     lib/hexdump.c
     lib/hexdump.h
-    include/aeon/file.h
+    fs/devfs.c
+    fs/devfs.h
+    fs/file.cpp
     include/aeon/console.h
     include/aeon/mutex.h
+    include/aeon/file.hpp
+    include/aeon/seek_direction.hpp
 )
 
 set_target_properties(kernel.bin PROPERTIES

@@ -7,6 +7,7 @@
 #include "platform/i386/hal.h"
 #include "platform/i386/idt.h"
 #include "platform/i386/irq.h"
+#include "lib/hexdump.h"
 
 static void
 play_sound (kuint32_t nFrequence)
@@ -57,6 +58,12 @@ kernel_main (const kuint32_t magic, const kuint32_t addr)
 
   ata_init ();
   ata_print_info ();
+
+  kuint8_t *buf = kmalloc (512);
+
+  ata_read_sector (0, 0, 0, buf);
+
+  //khexdump (buf, 512);
 
   kprintf ("Done!\n");
 }
